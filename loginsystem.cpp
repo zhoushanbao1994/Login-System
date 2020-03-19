@@ -12,16 +12,21 @@ LoginSystem::LoginSystem(QWidget *parent) :
     ui(new Ui::LoginSystem)
 {
     ui->setupUi(this);
-    db.dbstate = db.Connect(QCoreApplication::applicationDirPath()+"/../../LogSys/db.s3db");
-    ui->winStack->setCurrentIndex(0);
-    ui->stackedWidget->setCurrentIndex(1);
 
-    ui->passwordBox->setEchoMode(QLineEdit::Password);
-    ui->passwordBox->setInputMethodHints(Qt::ImhHiddenText| Qt::ImhNoPredictiveText|Qt::ImhNoAutoUppercase);
-    ui->pBox->setEchoMode(QLineEdit::Password);
-    ui->pBox->setInputMethodHints(Qt::ImhHiddenText| Qt::ImhNoPredictiveText|Qt::ImhNoAutoUppercase);
-    ui->pBox_2->setEchoMode(QLineEdit::Password);
-    ui->pBox_2->setInputMethodHints(Qt::ImhHiddenText| Qt::ImhNoPredictiveText|Qt::ImhNoAutoUppercase);
+    // 连接数据库
+    db.dbstate = db.Connect(QCoreApplication::applicationDirPath()+"/db.s3db");
+
+    ui->winStack->setCurrentIndex(0);   // 显示第0页
+    //ui->stackedWidget->setCurrentIndex(1);
+
+    ui->Login_passwordBox->setEchoMode(QLineEdit::Password);
+    ui->Login_passwordBox->setInputMethodHints(Qt::ImhHiddenText| Qt::ImhNoPredictiveText|Qt::ImhNoAutoUppercase);
+
+    ui->Register_pBox->setEchoMode(QLineEdit::Password);
+    ui->Register_pBox->setInputMethodHints(Qt::ImhHiddenText| Qt::ImhNoPredictiveText|Qt::ImhNoAutoUppercase);
+
+    ui->EditProfil_pBox->setEchoMode(QLineEdit::Password);
+    ui->EditProfil_pBox->setInputMethodHints(Qt::ImhHiddenText| Qt::ImhNoPredictiveText|Qt::ImhNoAutoUppercase);
 }
 
 LoginSystem::~LoginSystem()
@@ -29,27 +34,31 @@ LoginSystem::~LoginSystem()
     delete ui;
 }
 
-void LoginSystem::on_loginButton_clicked()
+/*****************************************************************************************************
+ ***************************************** Login 登录页 ***********************************************
+ *****************************************************************************************************/
+// 登录页-登录按键
+void LoginSystem::on_Login_loginButton_clicked()
 {
-    this->loggedIn = Login(ui->usernameBox->text(), ui->passwordBox->text());
+    this->loggedIn = Login(ui->Login_usernameBox->text(), ui->Login_passwordBox->text());
 
     if(this->loggedIn)
     {
-        this->username = ui->usernameBox->text();
-        this->password = ui->passwordBox->text();
+        this->username = ui->Login_usernameBox->text();
+        this->password = ui->Login_passwordBox->text();
 
-        ui->loginLabel->setText("");
+        ui->Login_loginLabelInfo->setText("");
         ui->winStack->setCurrentIndex(2);
     }
     else
     {
-        ui->loginLabel->setText("Login failed: Invalid credentials!");
+        ui->Login_loginLabelInfo->setText("Login failed: Invalid credentials!");
     }
 }
 
 bool LoginSystem::Login(QString u, QString p)
 {
-    ui->adminButton->setVisible(false);
+    ui->LoggedIn_adminButton->setVisible(false);
 
     bool exists = false;
 
@@ -69,91 +78,99 @@ bool LoginSystem::Login(QString u, QString p)
     return exists;
 }
 
-
-void LoginSystem::on_regButton_clicked()
+// 登录页-注册按键
+void LoginSystem::on_Login_regButton_clicked()
 {
-    ui->uBox->setText(ui->usernameBox->text());
-    ui->pBox->setText(ui->passwordBox->text());
+    ui->Register_uBox->setText(ui->Login_usernameBox->text());
+    ui->Register_pBox->setText(ui->Login_passwordBox->text());
     ui->winStack->setCurrentIndex(1);
 }
 
-void LoginSystem::on_logoutButton_clicked()
+
+
+
+/*****************************************************************************************************
+ **************************************** Register 注册页 *********************************************
+ *****************************************************************************************************/
+// 注册页-上传照片按键
+void LoginSystem::on_Register_uplButton_clicked()
 {
-    if(QMessageBox::Yes == QMessageBox(QMessageBox::Question,
-                                       "Login System", "Are you sure you want to logout?",
-                                       QMessageBox::Yes|QMessageBox::No).exec())
-    {
-        this->loggedIn = false;
-        ui->passwordBox->setText("");
-        ui->loginLabel->setText("You signed out!");
-        ui->winStack->setCurrentIndex(0);
-    }
+    this->picName = QFileDialog::getOpenFileName(this, tr("Open Image"), "/", tr("Image Files (*.png *.jpg *.bmp)"));
+    ui->Register_rpLabel->setText("<img src=\"file:///"+this->picName+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
 }
 
-void LoginSystem::on_completeRegButton_clicked()
+// 注册页-回退按键
+void LoginSystem::on_Register_backButton_clicked()
+{
+    ui->Login_loginLabelInfo->setText("");
+    ui->winStack->setCurrentIndex(0);
+}
+
+// 注册页-回退按键
+void LoginSystem::on_Register_completeRegButton_clicked()
 {
     bool halt = false;
 
-    if(ui->uBox->text() == "")
+    if(ui->Register_uBox->text() == "")
     {
-        ui->uBox->setPlaceholderText("Username EMPTY!");
+        ui->Register_uBox->setPlaceholderText("Username EMPTY!");
         halt = true;
     }
 
-    if(ui->pBox->text() == "")
+    if(ui->Register_pBox->text() == "")
     {
-        ui->pBox->setPlaceholderText("Password EMPTY!");
+        ui->Register_pBox->setPlaceholderText("Password EMPTY!");
         halt = true;
     }
 
-    if(ui->eBox->text() == "")
+    if(ui->Register_eBox->text() == "")
     {
-        ui->eBox->setPlaceholderText("E-mail EMPTY!");
+        ui->Register_eBox->setPlaceholderText("E-mail EMPTY!");
         halt = true;
     }
 
-    if(ui->fBox->text() == "")
+    if(ui->Register_fBox->text() == "")
     {
-        ui->fBox->setPlaceholderText("First Name EMPTY!");
+        ui->Register_fBox->setPlaceholderText("First Name EMPTY!");
         halt = true;
     }
 
-    if(ui->mBox->text() == "")
+    if(ui->Register_mBox->text() == "")
     {
-        ui->mBox->setPlaceholderText("Middle Name (optional)");
+        ui->Register_mBox->setPlaceholderText("Middle Name (optional)");
         halt = false;
     }
 
-    if(ui->lBox->text() == "")
+    if(ui->Register_lBox->text() == "")
     {
-        ui->lBox->setPlaceholderText("Last Name EMPTY!");
+        ui->Register_lBox->setPlaceholderText("Last Name EMPTY!");
         halt = true;
     }
 
     QSqlQuery cQuery(db.db);
     cQuery.prepare("SELECT username FROM sys_users WHERE username = (:un)");
-    cQuery.bindValue(":un", ui->uBox->text());
+    cQuery.bindValue(":un", ui->Register_uBox->text());
 
     if(cQuery.exec())
     {
         if(cQuery.next())
         {
-            ui->uBox->setText("");
-            ui->uBox->setPlaceholderText("Choose a different Username!");
+            ui->Register_uBox->setText("");
+            ui->Register_uBox->setPlaceholderText("Choose a different Username!");
             halt = true;
         }
     }
 
     QSqlQuery cQuery2(db.db);
     cQuery2.prepare("SELECT email FROM sys_users WHERE email = (:em)");
-    cQuery2.bindValue(":em", ui->eBox->text());
+    cQuery2.bindValue(":em", ui->Register_eBox->text());
 
     if(cQuery2.exec())
     {
         if(cQuery2.next())
         {
-            ui->eBox->setText("");
-            ui->eBox->setPlaceholderText("Use another E-mail!");
+            ui->Register_eBox->setText("");
+            ui->Register_eBox->setPlaceholderText("Use another E-mail!");
             halt = true;
         }
     }
@@ -161,13 +178,13 @@ void LoginSystem::on_completeRegButton_clicked()
 
     if(halt)
     {
-        ui->regLabel->setText("Please correct your mistakes.");
+        ui->Register_regLabelInfo->setText("Please correct your mistakes.");
     }
     else
     {
         if (this->picName != "")
         {
-            QString to = this->picDir+"/"+ui->uBox->text();
+            QString to = this->picDir+"/"+ui->Register_uBox->text();
 
             if (QFile::exists(to))
             {
@@ -178,46 +195,59 @@ void LoginSystem::on_completeRegButton_clicked()
             this->picName = "";
         }
 
-        ui->regLabel->setText("");
+        ui->Register_regLabelInfo->setText("");
         QSqlQuery iQuery(db.db);
         iQuery.prepare("INSERT INTO sys_users(username, passwd, fname, mname, lname, email)"\
                        "VALUES(:un, :pw, :fn, :mn, :ln, :em)");
-        iQuery.bindValue(":un", ui->uBox->text());
-        iQuery.bindValue(":pw", ui->pBox->text());
-        iQuery.bindValue(":fn", ui->fBox->text());
-        iQuery.bindValue(":mn", ui->mBox->text());
-        iQuery.bindValue(":ln", ui->lBox->text());
-        iQuery.bindValue(":em", ui->eBox->text());
+        iQuery.bindValue(":un", ui->Register_uBox->text());
+        iQuery.bindValue(":pw", ui->Register_pBox->text());
+        iQuery.bindValue(":fn", ui->Register_fBox->text());
+        iQuery.bindValue(":mn", ui->Register_mBox->text());
+        iQuery.bindValue(":ln", ui->Register_lBox->text());
+        iQuery.bindValue(":em", ui->Register_eBox->text());
 
         if(iQuery.exec())
         {
-            ui->uBox->setText("");
-            ui->pBox->setText("");
-            ui->eBox->setText("");
-            ui->fBox->setText("");
-            ui->mBox->setText("");
-            ui->lBox->setText("");
-            ui->rpLabel->setText("<img src=\":user.png\" />");
-            ui->loginLabel->setText("Registration Successful! You can now login.");
+            ui->Register_uBox->setText("");
+            ui->Register_pBox->setText("");
+            ui->Register_eBox->setText("");
+            ui->Register_fBox->setText("");
+            ui->Register_mBox->setText("");
+            ui->Register_lBox->setText("");
+            ui->Register_rpLabel->setText("<img src=\":user.png\" />");
+            ui->Login_loginLabelInfo->setText("Registration Successful! You can now login.");
             ui->winStack->setCurrentIndex(0);
         }
 
     }
 }
 
-void LoginSystem::on_backButton_clicked()
+
+/*****************************************************************************************************
+ ************************************* Logged In 登录成功页 ********************************************
+ *****************************************************************************************************/
+// 登录成功页-管理面板按键
+void LoginSystem::on_LoggedIn_adminButton_clicked()
 {
-    ui->loginLabel->setText("");
-    ui->winStack->setCurrentIndex(0);
+    ui->winStack->setCurrentIndex(4);
 }
 
-
-void LoginSystem::on_backButton_2_clicked()
+// 登录成功页-登出按键
+void LoginSystem::on_LoggedIn_logoutButton_clicked()
 {
-    ui->winStack->setCurrentIndex(2);
+    if(QMessageBox::Yes == QMessageBox(QMessageBox::Question,
+                                       "Login System", "Are you sure you want to logout?",
+                                       QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        this->loggedIn = false;
+        ui->Login_passwordBox->setText("");
+        ui->Login_loginLabelInfo->setText("You signed out!");
+        ui->winStack->setCurrentIndex(0);
+    }
 }
 
-void LoginSystem::on_editButton_clicked()
+// 登录成功页-编辑个人资料按键
+void LoginSystem::on_LoggedIn_editButton_clicked()
 {
     QSqlQuery fetcher;
     fetcher.prepare("SELECT * FROM sys_users WHERE username = (:un) AND passwd = (:pw)");
@@ -234,18 +264,19 @@ void LoginSystem::on_editButton_clicked()
 
     while (fetcher.next())
     {
-        ui->uBox_2->setText(fetcher.value(idUsername).toString());
-        ui->pBox_2->setText(fetcher.value(idPasswd).toString());
-        ui->eBox_2->setText(fetcher.value(idEmail).toString());
-        ui->fBox_2->setText(fetcher.value(idFname).toString());
-        ui->mBox_2->setText(fetcher.value(idMname).toString());
-        ui->lBox_2->setText(fetcher.value(idLname).toString());
+        ui->EditProfil_uBox->setText(fetcher.value(idUsername).toString());
+        ui->EditProfil_pBox->setText(fetcher.value(idPasswd).toString());
+        ui->EditProfil_eBox->setText(fetcher.value(idEmail).toString());
+        ui->EditProfil_fBox->setText(fetcher.value(idFname).toString());
+        ui->EditProfil_mBox->setText(fetcher.value(idMname).toString());
+        ui->EditProfil_lBox->setText(fetcher.value(idLname).toString());
     }
 
     ui->winStack->setCurrentIndex(3);
 }
 
-void LoginSystem::on_delButton_clicked()
+// 登录成功页-删除账户按键
+void LoginSystem::on_LoggedIn_delButton_clicked()
 {
     if(QMessageBox::Yes == QMessageBox(QMessageBox::Question,
                                        "Login System", "Are you sure you want to delete your account?",
@@ -264,80 +295,94 @@ void LoginSystem::on_delButton_clicked()
 
         if(dQuery.exec())
         {
-            ui->usernameBox->setText("");
-            ui->passwordBox->setText("");
-            ui->loginLabel->setText("Account deleted!");
+            ui->Login_usernameBox->setText("");
+            ui->Login_passwordBox->setText("");
+            ui->Login_loginLabelInfo->setText("Account deleted!");
             ui->winStack->setCurrentIndex(0);
         }
     }
 }
 
-void LoginSystem::on_editedButton_clicked()
+/*****************************************************************************************************
+ ************************************ Edit Profil 编辑资料页 *******************************************
+ *****************************************************************************************************/
+// 编辑资料页-上传照片按键
+void LoginSystem::on_EditProfil_uplButton_clicked()
 {
-
-
+    this->picName = QFileDialog::getOpenFileName(this, tr("Open Image"), "/", tr("Image Files (*.png *.jpg *.bmp)"));
+    ui->EditProfil_rpLabel->setText("<img src=\"file:///"+this->picName+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
+}
+// 编辑资料页-返回按键
+void LoginSystem::on_EditProfil_backButton_clicked()
+{
+    // 返回登录成功页
+    ui->winStack->setCurrentIndex(2);
+}
+// 编辑资料页-确认编辑资料
+void LoginSystem::on_EditProfil_editedButton_clicked()
+{
     bool halt = false;
 
-    if(ui->uBox_2->text() == "")
+    if(ui->EditProfil_uBox->text() == "")
     {
-        ui->uBox_2->setPlaceholderText("Username EMPTY!");
+        ui->EditProfil_uBox->setPlaceholderText("Username EMPTY!");
         halt = true;
     }
 
-    if(ui->pBox_2->text() == "")
+    if(ui->EditProfil_pBox->text() == "")
     {
-        ui->pBox_2->setPlaceholderText("Password EMPTY!");
+        ui->EditProfil_pBox->setPlaceholderText("Password EMPTY!");
         halt = true;
     }
 
-    if(ui->eBox_2->text() == "")
+    if(ui->EditProfil_eBox->text() == "")
     {
-        ui->eBox_2->setPlaceholderText("E-mail EMPTY!");
+        ui->EditProfil_eBox->setPlaceholderText("E-mail EMPTY!");
         halt = true;
     }
 
-    if(ui->fBox_2->text() == "")
+    if(ui->EditProfil_fBox->text() == "")
     {
-        ui->fBox_2->setPlaceholderText("First Name EMPTY!");
+        ui->EditProfil_fBox->setPlaceholderText("First Name EMPTY!");
         halt = true;
     }
 
-    if(ui->mBox_2->text() == "")
+    if(ui->EditProfil_mBox->text() == "")
     {
-        ui->mBox_2->setPlaceholderText("Middle Name (optional)");
+        ui->EditProfil_mBox->setPlaceholderText("Middle Name (optional)");
         halt = false;
     }
 
-    if(ui->lBox_2->text() == "")
+    if(ui->EditProfil_lBox->text() == "")
     {
-        ui->lBox_2->setPlaceholderText("Last Name EMPTY!");
+        ui->EditProfil_lBox->setPlaceholderText("Last Name EMPTY!");
         halt = true;
     }
 
     QSqlQuery cQuery(db.db);
     cQuery.prepare("SELECT username FROM sys_users WHERE username = (:un)");
-    cQuery.bindValue(":un", ui->uBox->text());
+    cQuery.bindValue(":un", ui->Register_uBox->text());
 
     if(cQuery.exec())
     {
-        if(cQuery.next() && ui->uBox_2->text() != cQuery.value(0).toString())
+        if(cQuery.next() && ui->EditProfil_uBox->text() != cQuery.value(0).toString())
         {
-            ui->uBox_2->setText("");
-            ui->uBox_2->setPlaceholderText("Choose a different Username!");
+            ui->EditProfil_uBox->setText("");
+            ui->EditProfil_uBox->setPlaceholderText("Choose a different Username!");
             halt = true;
         }
     }
 
     QSqlQuery cQuery2(db.db);
     cQuery2.prepare("SELECT email FROM sys_users WHERE email = (:em)");
-    cQuery2.bindValue(":em", ui->eBox_2->text());
+    cQuery2.bindValue(":em", ui->EditProfil_eBox->text());
 
     if(cQuery2.exec())
     {
-        if(cQuery2.next() && ui->eBox_2->text() != cQuery2.value(0).toString())
+        if(cQuery2.next() && ui->EditProfil_eBox->text() != cQuery2.value(0).toString())
         {
-            ui->eBox_2->setText("");
-            ui->eBox_2->setPlaceholderText("Use another E-mail!");
+            ui->EditProfil_eBox->setText("");
+            ui->EditProfil_eBox->setPlaceholderText("Use another E-mail!");
             halt = true;
         }
     }
@@ -345,13 +390,13 @@ void LoginSystem::on_editedButton_clicked()
 
     if(halt)
     {
-        ui->regLabel_2->setText("Please correct your mistakes.");
+        ui->EditProfil_regLabelInfo->setText("Please correct your mistakes.");
     }
     else
     {
         if (this->picName != "")
         {
-            QString to = this->picDir+"/"+ui->uBox_2->text();
+            QString to = this->picDir+"/"+ui->EditProfil_uBox->text();
 
             if (QFile::exists(to))
             {
@@ -362,16 +407,16 @@ void LoginSystem::on_editedButton_clicked()
             this->picName = "";
         }
 
-        ui->regLabel_2->setText("");
+        ui->EditProfil_regLabelInfo->setText("");
         QSqlQuery iQuery(db.db);
         iQuery.prepare("UPDATE sys_users SET username=(:un), passwd=(:pw), fname=(:fn), mname=(:mn), lname=(:ln), email=(:em) WHERE username=(:uno)");
-        iQuery.bindValue(":un", ui->uBox_2->text());
-        iQuery.bindValue(":pw", ui->pBox_2->text());
-        iQuery.bindValue(":fn", ui->fBox_2->text());
-        iQuery.bindValue(":mn", ui->mBox_2->text());
-        iQuery.bindValue(":ln", ui->lBox_2->text());
-        iQuery.bindValue(":em", ui->eBox_2->text());
-        iQuery.bindValue(":uno", ui->uBox_2->text());
+        iQuery.bindValue(":un", ui->EditProfil_uBox->text());
+        iQuery.bindValue(":pw", ui->EditProfil_pBox->text());
+        iQuery.bindValue(":fn", ui->EditProfil_fBox->text());
+        iQuery.bindValue(":mn", ui->EditProfil_mBox->text());
+        iQuery.bindValue(":ln", ui->EditProfil_lBox->text());
+        iQuery.bindValue(":em", ui->EditProfil_eBox->text());
+        iQuery.bindValue(":uno", ui->EditProfil_uBox->text());
 
         if(iQuery.exec())
         {
@@ -381,6 +426,90 @@ void LoginSystem::on_editedButton_clicked()
     }
 }
 
+/*****************************************************************************************************
+ ************************************ Admin Panel 管理面板页 *******************************************
+ *****************************************************************************************************/
+// 管理面板页-显示所有管理用户
+void LoginSystem::on_AdminPanel_userBrowse_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+// 管理面板页-显示所有普通用户
+void LoginSystem::on_AdminPanel_adminBrowse_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+}
+// 管理面板页-返回到个人主页
+void LoginSystem::on_AdminPanel_pageButton_clicked()
+{
+    ui->winStack->setCurrentIndex(2);
+}
+
+// 管理面板页-删除所有普通用户
+void LoginSystem::on_AdminPanel_delUButton_clicked()
+{
+    if(QMessageBox::Yes == QMessageBox(QMessageBox::Question,
+                                           "Login System", "Are you sure you want to erase all accounts?",
+                                           QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        QSqlQuery dQuery(db.db);
+        dQuery.prepare("DELETE FROM sys_users WHERE rank != 0 AND rank != -1");
+
+        if(dQuery.exec())
+        {
+            ui->AdminPanel_adminLabel->setText("Query executed!");
+        }
+    }
+}
+// 管理面板页-删除所有管理用户
+void LoginSystem::on_AdminPanel_delAButton_clicked()
+{
+    if(QMessageBox::Yes == QMessageBox(QMessageBox::Question,
+                                           "Login System", "Are you sure you want to erase all administrators?"\
+                                           "\n(This won't erase regular users and you)",
+                                           QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        QSqlQuery dQuery(db.db);
+        dQuery.prepare("DELETE FROM sys_users WHERE rank != 1 AND username != \"" + this->username + "\"");
+
+        if(dQuery.exec())
+        {
+            ui->AdminPanel_adminLabel->setText("Query executed!");
+        }
+    }
+}
+
+// 管理面板页-撤销所有修改
+void LoginSystem::on_AdminPanel_backButton_clicked()
+{
+    this->tblMdl->revertAll();
+    this->tblMdl->database().rollback();
+}
+
+// 管理面板页-执行所有修改
+void LoginSystem::on_AdminPanel_editedButton_clicked()
+{
+    if(this->tblMdl->submitAll())
+    {
+        this->tblMdl->database().commit();
+        ui->AdminPanel_adminLabel->setText("Saved to database!");
+    }
+    else
+    {
+        this->tblMdl->database().rollback();
+    }
+}
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+
+
+
 void LoginSystem::on_winStack_currentChanged(int arg1)
 {
 
@@ -388,7 +517,7 @@ void LoginSystem::on_winStack_currentChanged(int arg1)
     {
         if(QFile::exists(this->picDir+"/"+this->username))
         {
-            ui->rpLabel_2->setText("<img src=\"file:///"+this->picDir+"/"+this->username+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
+            ui->EditProfil_rpLabel->setText("<img src=\"file:///"+this->picDir+"/"+this->username+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
         }
     }
 
@@ -396,7 +525,7 @@ void LoginSystem::on_winStack_currentChanged(int arg1)
     {
         if(QFile::exists(this->picDir+"/"+this->username))
         {
-            ui->loggedPic->setText("<img src=\"file:///"+this->picDir+"/"+this->username+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
+            ui->LoggedIn_loggedPic->setText("<img src=\"file:///"+this->picDir+"/"+this->username+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
         }
 
         QSqlQuery fetcher;
@@ -422,11 +551,11 @@ void LoginSystem::on_winStack_currentChanged(int arg1)
         }
         if(rank == "-1")
         {
-            ui->adminButton->setVisible(true);
+            ui->LoggedIn_adminButton->setVisible(true);
         }
-        ui->nameLabel->setText(fullname);
-        ui->rankLabel->setText(rank);
-        ui->emailLabel->setText(email);
+        ui->LoggedIn_nameLabel->setText(fullname);
+        ui->LoggedIn_rankLabel->setText(rank);
+        ui->LoggedIn_emailLabel->setText(email);
     }
 
     if(arg1 == 4 && this->loggedIn)
@@ -435,112 +564,28 @@ void LoginSystem::on_winStack_currentChanged(int arg1)
     }
 }
 
-void LoginSystem::on_uplButton_clicked()
-{
-    this->picName = QFileDialog::getOpenFileName(this, tr("Open Image"), "/", tr("Image Files (*.png *.jpg *.bmp)"));
-    ui->rpLabel->setText("<img src=\"file:///"+this->picName+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
-
-}
-
-void LoginSystem::on_uplButton_2_clicked()
-{
-    this->picName = QFileDialog::getOpenFileName(this, tr("Open Image"), "/", tr("Image Files (*.png *.jpg *.bmp)"));
-    ui->rpLabel_2->setText("<img src=\"file:///"+this->picName+"\" alt=\"Image read error!\" height=\"128\" width=\"128\" />");
-}
-
-void LoginSystem::on_adminButton_clicked()
-{
-    ui->winStack->setCurrentIndex(4);
-}
-
-void LoginSystem::on_pageButton_clicked()
-{
-    ui->winStack->setCurrentIndex(2);
-}
-
-void LoginSystem::on_editedButton_2_clicked()
-{
-    if(this->tblMdl->submitAll())
-    {
-        this->tblMdl->database().commit();
-        ui->adminLabel->setText("Saved to database!");
-    }
-    else
-    {
-        this->tblMdl->database().rollback();
-    }
-}
-
-void LoginSystem::on_backButton_5_clicked()
-{
-    this->tblMdl->revertAll();
-    this->tblMdl->database().rollback();
-}
-
-void LoginSystem::on_userBrowse_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(0);
-}
-
-void LoginSystem::on_delUButton_clicked()
-{
-    if(QMessageBox::Yes == QMessageBox(QMessageBox::Question,
-                                           "Login System", "Are you sure you want to erase all accounts?",
-                                           QMessageBox::Yes|QMessageBox::No).exec())
-    {
-        QSqlQuery dQuery(db.db);
-        dQuery.prepare("DELETE FROM sys_users WHERE rank != 0 AND rank != -1");
-
-        if(dQuery.exec())
-        {
-            ui->adminLabel->setText("Query executed!");
-        }
-    }
-}
-
 void LoginSystem::on_stackedWidget_currentChanged(int arg1)
 {
     if(arg1 == 0 && this->loggedIn)
     {
-        ui->headLabel->setText("USERS");
+        ui->AdminPanel_headLabel->setText("USERS");
         this->tblMdl = new QSqlTableModel;
         this->tblMdl->setTable("sys_users");
         this->tblMdl->setFilter("rank != -1 AND rank != 0");
         this->tblMdl->select();
-        ui->tableView->setModel(this->tblMdl);
+        ui->AdminPanel_tableView->setModel(this->tblMdl);
         this->tblMdl->database().transaction();
     }
 
     if(arg1 == 1 && this->loggedIn)
     {
-        ui->headLabel->setText("ADMINS");
+        ui->AdminPanel_headLabel->setText("ADMINS");
         this->tblMdl = new QSqlTableModel;
         this->tblMdl->setTable("sys_users");
         this->tblMdl->setFilter("rank == -1 OR rank == 0");
         this->tblMdl->select();
-        ui->tableView_2->setModel(this->tblMdl);
+        ui->AdminPanel_tableView_2->setModel(this->tblMdl);
         this->tblMdl->database().transaction();
     }
 }
 
-void LoginSystem::on_adminBrowse_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(1);
-}
-
-void LoginSystem::on_delAButton_clicked()
-{
-    if(QMessageBox::Yes == QMessageBox(QMessageBox::Question,
-                                           "Login System", "Are you sure you want to erase all administrators?"\
-                                           "\n(This won't erase regular users and you)",
-                                           QMessageBox::Yes|QMessageBox::No).exec())
-    {
-        QSqlQuery dQuery(db.db);
-        dQuery.prepare("DELETE FROM sys_users WHERE rank != 1 AND username != \"" + this->username + "\"");
-
-        if(dQuery.exec())
-        {
-            ui->adminLabel->setText("Query executed!");
-        }
-    }
-}

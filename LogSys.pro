@@ -12,14 +12,17 @@ TARGET = LogSys
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        loginsystem.cpp \
+SOURCES += \
+    main.cpp \
+    loginsystem.cpp \
     qdb.cpp
 
-HEADERS  += loginsystem.h \
+HEADERS  += \
+    loginsystem.h \
     qdb.h
 
-FORMS    += loginsystem.ui
+FORMS    += \
+    loginsystem.ui
 
 DISTFILES += \
     db.s3db.sql

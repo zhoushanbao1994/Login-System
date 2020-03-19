@@ -16,11 +16,6 @@ class LoginSystem : public QMainWindow
 public:
     explicit LoginSystem(QWidget *parent = nullptr);
     ~LoginSystem();
-    bool Login(QString u, QString p);
-    bool loggedIn;
-    QString picName;
-    QString picDir = QCoreApplication::applicationDirPath()+"/../../LogSys/users/avatar";
-    QSqlTableModel* tblMdl;
 
 private slots:
     // Login 登录页
@@ -64,6 +59,14 @@ private slots:
 
 private:
     Ui::LoginSystem *ui;
+
+    bool Login(QString u, QString p);
+    bool m_loggedIn;        // 登录是否成功
+
+    QString m_picName;      // 存放头像路径
+    QString picDir = QCoreApplication::applicationDirPath()+"/../../LogSys/users/avatar";
+    QSqlTableModel* tblMdl;
+
     QString username;
     QString password;
 };

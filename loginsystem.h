@@ -5,6 +5,8 @@
 #include <QCoreApplication>
 #include <QSqlTableModel>
 
+#include "qdb.h"
+
 namespace Ui {
 class LoginSystem;
 }
@@ -60,8 +62,9 @@ private slots:
 private:
     Ui::LoginSystem *ui;
 
-    bool Login(QString u, QString p);
     bool m_loggedIn;        // 登录是否成功
+
+    QDB *m_db;
 
     QString m_picName;      // 存放头像路径
     QString picDir = QCoreApplication::applicationDirPath()+"/../../LogSys/users/avatar";

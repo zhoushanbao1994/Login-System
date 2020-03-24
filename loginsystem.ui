@@ -161,7 +161,7 @@
       </rect>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="pageLogin">
       <widget class="QFrame" name="frame_2">
